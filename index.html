@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>美慧学员 · 城市场馆推荐计划</title>
+  <style>
+    :root{
+      --bg:#f7f5ef;
+      --paper:#fffdf8;
+      --ink:#141414;
+      --muted:#706b61;
+      --line:#d9d1bf;
+      --gold:#a68852;
+      --gold2:#c4aa70;
+      --soft:#eee8dc;
+      --black:#111111;
+      --card:#fbf8f1;
+      --radius:24px;
+      --shadow:0 22px 70px rgba(20,20,20,.08);
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{scroll-behavior:smooth;}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",Arial,sans-serif;}
+    body{overflow-x:hidden;}
+    a{color:inherit;text-decoration:none;}
+    .page-shell{min-height:100vh;padding:22px 18px 34px;position:relative;}
+    .page-shell:before{content:"";position:fixed;inset:0;z-index:-3;background:
+      radial-gradient(circle at 88% 8%,rgba(196,170,112,.20),transparent 32%),
+      radial-gradient(circle at 5% 82%,rgba(15,15,15,.06),transparent 30%),
+      linear-gradient(145deg,#fbf9f3 0%,#f1ece2 100%);}
+    .page-shell:after{content:"";position:fixed;right:-160px;top:72px;width:440px;height:440px;border:1px solid rgba(166,136,82,.30);border-radius:50%;z-index:-2;}
+    .wrap{max-width:920px;margin:0 auto;}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;}
+    .brand{font-size:12px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;}
+    .brand b{display:block;font-size:14px;letter-spacing:.08em;color:var(--ink);font-weight:650;margin-bottom:3px;}
+    .mini{font-size:12px;color:var(--gold);border:1px solid rgba(166,136,82,.35);border-radius:999px;padding:7px 11px;background:rgba(255,253,248,.68);white-space:nowrap;}
+
+    /* 关键：纯 HTML + CSS 锚点切换。即使 JS 被预览环境屏蔽，也能点击进入下一层。 */
+    .screen{display:none;animation:fade .22s ease both;}
+    #home{display:block;}
+    .screen:target{display:block;}
+    /* 修复：当目标就是 #home 时，不能再把首页隐藏，否则返回首页会空白。
+       这里只在进入第二级 / 第三级 / 第四级页面时隐藏首页。 */
+    body:has(#cities:target) #home,
+    body:has(#city-suzhou:target) #home,
+    body:has(#city-langfang:target) #home,
+    body:has(#city-beijing:target) #home,
+    body:has(#city-shanghai:target) #home,
+    body:has(#city-chengdu:target) #home,
+    body:has(#city-guangzhou:target) #home,
+    body:has(#city-hanzhong:target) #home,
+    body:has(#coach-miki:target) #home,
+    body:has(#coach-yueqinghua:target) #home{display:none;}
+    @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    .hero{min-height:calc(100vh - 110px);display:flex;flex-direction:column;justify-content:space-between;gap:32px;}
+    .label{display:inline-flex;align-items:center;gap:9px;color:var(--gold);font-size:13px;letter-spacing:.18em;margin:10px 0 22px;}
+    .label:before{content:"";width:36px;height:1px;background:var(--gold);display:inline-block;}
+    h1{font-family:"Songti SC","STSong","Noto Serif SC",serif;font-weight:750;line-height:1.06;font-size:clamp(48px,10vw,92px);letter-spacing:.02em;margin:0;color:var(--ink);}
+    h1 .dot{color:var(--gold);}
+    .hero-sub{margin-top:22px;font-size:clamp(19px,4vw,30px);letter-spacing:.08em;color:#2a2927;line-height:1.45;}
+    .hero-desc{margin-top:32px;max-width:700px;color:var(--muted);font-size:16px;line-height:1.95;}
+    .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px;}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border-radius:999px;padding:15px 22px;background:var(--black);color:#fff;font-weight:650;letter-spacing:.04em;box-shadow:0 12px 32px rgba(0,0,0,.15);border:0;}
+    .btn.secondary{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none;}
+    .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px;}
+    .info-card{background:rgba(255,253,248,.76);border:1px solid rgba(217,209,191,.88);border-radius:22px;padding:18px;min-height:128px;}
+    .info-card .num{font-size:12px;color:var(--gold);letter-spacing:.18em;margin-bottom:18px;}
+    .info-card h3{margin:0 0 8px;font-size:17px;}
+    .info-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.7;}
+    .home-section{margin-top:18px;background:rgba(255,253,248,.66);border:1px solid rgba(217,209,191,.72);border-radius:24px;padding:20px;}
+    .home-section h3{font-family:"Songti SC","STSong","Noto Serif SC",serif;font-size:24px;margin:0 0 12px;}
+    .home-intro-title h3{font-size:28px;line-height:1.38;margin:0;}
+    .section-no{font-family:Georgia,"Times New Roman",serif;font-size:28px;letter-spacing:.08em;color:var(--gold);margin-bottom:12px;font-weight:700;}
+    .home-section p{margin:0 0 12px;color:var(--muted);line-height:1.9;font-size:14px;}
+    .home-section p:last-child{margin-bottom:0;}
+    .home-section strong{color:var(--ink);font-weight:750;}
+    .bottom-line{border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;align-items:center;padding-top:18px;margin-top:34px;color:var(--muted);font-size:13px;letter-spacing:.08em;}
+    .slashes{color:var(--gold);letter-spacing:.25em;white-space:nowrap;}
+
+    .breadcrumbs{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:18px;color:var(--muted);font-size:13px;}
+    .breadcrumbs a{color:var(--muted);}
+    .breadcrumbs strong{color:var(--ink);font-weight:650;}
+    .panel{background:rgba(255,253,248,.80);border:1px solid rgba(217,209,191,.9);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+    .panel-head{padding:24px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:18px;background:linear-gradient(135deg,rgba(255,255,255,.56),rgba(238,232,220,.34));}
+    .eyebrow{font-size:12px;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+    h2{margin:0;font-family:"Songti SC","STSong","Noto Serif SC",serif;font-size:34px;line-height:1.15;letter-spacing:.04em;}
+    .panel-desc{margin:12px 0 0;color:var(--muted);font-size:14px;line-height:1.8;}
+    .back{border:1px solid var(--line);background:rgba(255,253,248,.86);border-radius:999px;padding:10px 13px;color:var(--ink);font-size:13px;white-space:nowrap;}
+    .content{padding:22px;}
+    .city-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+    .city-card,.coach-card,.detail-block{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;transition:.18s ease;position:relative;overflow:hidden;}
+    .city-card{min-height:160px;display:block;}
+    .city-card:active,.coach-card:active,.btn:active{transform:scale(.985);}
+    .city-card:before{content:"";position:absolute;right:-28px;top:-28px;width:112px;height:112px;border:1px solid rgba(166,136,82,.28);border-radius:50%;}
+    .city-name{font-size:30px;font-family:"Songti SC","STSong","Noto Serif SC",serif;font-weight:750;margin-bottom:12px;}
+    .city-meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px;}
+    .pill{font-size:12px;border:1px solid rgba(166,136,82,.36);color:#725f3c;border-radius:999px;padding:5px 9px;background:rgba(250,246,236,.75);}
+    .arrow{position:absolute;right:18px;bottom:16px;color:var(--gold);font-size:24px;}
+    .muted{color:var(--muted);font-size:13px;line-height:1.75;}
+    .empty{opacity:.62;}
+    .empty .arrow{display:none;}
+    .coach-list{display:grid;grid-template-columns:1fr;gap:14px;}
+    .coach-card{cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;}
+    .coach-card h3{font-size:24px;margin:0 0 8px;font-family:"Songti SC","STSong","Noto Serif SC",serif;}
+    .coach-badge{align-self:start;background:#111;color:#fff;border-radius:999px;padding:8px 11px;font-size:12px;letter-spacing:.05em;}
+    .tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px;}
+    .tag{font-size:12px;color:#4f4b44;background:#efe8d9;border-radius:999px;padding:6px 9px;}
+    .profile{padding:24px;background:#111;color:#fff;border-radius:24px;position:relative;overflow:hidden;}
+    .profile:after{content:"";position:absolute;right:-80px;top:-90px;width:250px;height:250px;border:1px solid rgba(196,170,112,.4);border-radius:50%;}
+    .profile .eyebrow{color:var(--gold2);}
+    .profile h2{font-size:42px;color:#fff;margin-bottom:12px;}
+    .profile p{color:#d9d4c8;line-height:1.85;margin:0;max-width:680px;}
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+    .detail-block h4{margin:0 0 12px;font-size:15px;color:var(--gold);letter-spacing:.12em;}
+    .detail-block ul{margin:0;padding-left:18px;color:#282725;line-height:1.9;font-size:14px;}
+    .quote{font-family:"Songti SC","STSong","Noto Serif SC",serif;font-size:24px;line-height:1.6;margin:0;color:#171717;}
+    .contact-card{display:grid;grid-template-columns:1fr;gap:18px;align-items:center;}
+    .space-gallery{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;position:relative;overflow:hidden;}
+    .space-gallery h4{margin:0 0 12px;font-size:15px;color:var(--gold);letter-spacing:.12em;}
+    .gallery-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:12px;}
+    .gallery-main,.gallery-small{min-height:160px;border-radius:18px;background:linear-gradient(135deg,rgba(255,253,248,.95),rgba(238,232,220,.88));border:1px dashed rgba(166,136,82,.38);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:13px;line-height:1.7;padding:18px;}
+    .gallery-side{display:grid;gap:12px;}
+    .gallery-small{min-height:74px;}
+
+    .qr{width:130px;height:130px;border-radius:16px;background:linear-gradient(135deg,#111 0 18%,#fff 18% 28%,#111 28% 39%,#fff 39% 49%,#111 49% 64%,#fff 64% 75%,#111 75% 100%);border:10px solid #fff;box-shadow:inset 0 0 0 1px #ddd;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;text-align:center;line-height:1.3;}
+    .notice{margin-top:16px;color:var(--muted);font-size:12px;line-height:1.8;}
+    .city-placeholder{display:grid;grid-template-columns:1fr;gap:14px;}
+
+
+    .level-nav{display:flex;justify-content:center;gap:12px;margin:18px 0 4px;}
+    .back-big{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:13px 20px;background:var(--black);color:#fff;font-weight:650;letter-spacing:.04em;box-shadow:0 12px 32px rgba(0,0,0,.14);}
+    .back-big.light{background:rgba(255,253,248,.88);color:var(--ink);border:1px solid var(--line);box-shadow:none;}
+
+
+    .hero-rich{gap:26px;}
+    .hero-top-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:stretch;}
+    .headline-box{margin-top:22px;background:rgba(255,253,248,.72);border:1px solid rgba(217,209,191,.72);border-radius:28px;padding:24px;position:relative;overflow:hidden;}
+    .headline-box:after{content:"";position:absolute;right:-42px;top:-42px;width:150px;height:150px;border-radius:50%;border:1px solid rgba(166,136,82,.18);}
+    .headline-kicker{font-size:12px;letter-spacing:.24em;color:var(--gold);margin-bottom:10px;}
+    .headline-box h3{font-family:"Songti SC","STSong","Noto Serif SC",serif;font-size:clamp(30px,4.6vw,42px);line-height:1.32;margin:0 0 12px;}
+    .headline-box h3 span{font-weight:800;color:var(--ink);}
+    .headline-box p{margin:0;color:var(--muted);font-size:15px;line-height:1.9;max-width:560px;}
+    .focus-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+    .focus-chip{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 12px;background:rgba(255,253,248,.78);border:1px solid rgba(217,209,191,.86);font-size:12px;color:#4c463d;}
+    .focus-chip:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block;}
+    .hero-visual{background:linear-gradient(160deg,rgba(255,253,248,.88),rgba(243,238,228,.98));border:1px solid rgba(217,209,191,.88);border-radius:30px;box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;min-height:100%;}
+    .hero-visual:before{content:"";position:absolute;right:-50px;top:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(196,170,112,.18),rgba(196,170,112,0));}
+    .visual-note{position:absolute;left:22px;top:18px;font-size:11px;letter-spacing:.22em;color:var(--gold);}
+    .visual-stage{position:relative;display:grid;place-items:center;min-height:250px;border-radius:24px;background:linear-gradient(180deg,rgba(255,255,255,.45),rgba(238,232,220,.55));overflow:hidden;}
+    .visual-stage:before{content:"";position:absolute;width:250px;height:250px;border-radius:50%;border:1px solid rgba(166,136,82,.26);}
+    .visual-stage:after{content:"";position:absolute;width:132px;height:132px;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(255,255,255,.9),rgba(196,170,112,.22));}
+    .body-glyph{position:relative;z-index:1;width:154px;height:154px;border-radius:50%;background:rgba(255,255,255,.86);display:grid;place-items:center;box-shadow:0 18px 34px rgba(20,20,20,.08);border:1px solid rgba(217,209,191,.8);}
+    .body-glyph svg{width:84px;height:84px;stroke:#2b2926;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+    .visual-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;position:relative;z-index:1;}
+    .visual-card{background:rgba(255,253,248,.8);border:1px solid rgba(217,209,191,.82);border-radius:18px;padding:14px;min-height:88px;}
+    .visual-card h4{margin:0 0 8px;font-size:14px;color:var(--ink);}
+    .visual-card p{margin:0;font-size:12px;line-height:1.7;color:var(--muted);}
+    .statement-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:4px;}
+    .statement-card{background:rgba(255,253,248,.76);border:1px solid rgba(217,209,191,.85);border-radius:28px;padding:22px;position:relative;overflow:hidden;}
+    .statement-card:before{content:"";position:absolute;right:-36px;top:-36px;width:120px;height:120px;border-radius:50%;border:1px solid rgba(166,136,82,.14);}
+    .statement-card .section-no{margin-bottom:10px;font-size:24px;}
+    .statement-title{font-family:"Songti SC","STSong","Noto Serif SC",serif;font-size:24px;line-height:1.35;margin:0 0 12px;}
+    .statement-card p{margin:0 0 12px;color:var(--muted);font-size:14px;line-height:1.9;}
+    .statement-card p:last-child{margin-bottom:0;}
+    .statement-card strong{color:var(--ink);font-weight:800;}
+    .key-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:9px;}
+    .key-list li{padding-left:16px;position:relative;color:#49453e;line-height:1.85;font-size:14px;}
+    .key-list li:before{content:"";position:absolute;left:0;top:.78em;width:6px;height:6px;border-radius:50%;background:var(--gold);}
+    .mantra{display:grid;gap:8px;margin-top:14px;padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(17,17,17,.96),rgba(48,46,42,.92));color:#fff;}
+    .mantra span{display:block;font-size:18px;line-height:1.6;font-weight:760;letter-spacing:.02em;}
+    .spotlight{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(196,170,112,.16);color:#5b4a2e;font-size:12px;letter-spacing:.12em;margin-bottom:12px;}
+    .quote-banner{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;margin-top:4px;background:#111;color:#fff;border-radius:26px;padding:22px 24px;box-shadow:0 16px 38px rgba(20,20,20,.14);}
+    .quote-banner .quote-no{font-family:Georgia,"Times New Roman",serif;font-size:42px;line-height:1;color:var(--gold2);}
+    .quote-banner p{margin:0;color:#e8e1d2;font-size:15px;line-height:1.9;}
+    .quote-banner strong{color:#fff;}
+    .cta-panel{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-top:6px;padding:20px 22px;border:1px solid rgba(217,209,191,.85);border-radius:24px;background:rgba(255,253,248,.8);}
+    .quote-banner-clean{display:block;padding:26px 28px;border-radius:28px;background:linear-gradient(135deg,#111 0%,#24211d 100%);}
+    .quote-banner-clean .quote-main{margin:0 0 12px;color:#fff;font-family:"Songti SC","STSong","Noto Serif SC",serif;font-size:24px;line-height:1.55;letter-spacing:.02em;}
+    .quote-banner-clean .quote-main strong{color:#fff;font-weight:800;}
+    .quote-banner-clean .quote-sub{margin:0;color:#d9d4c8;font-size:15px;line-height:1.9;max-width:760px;}
+    .cta-panel p{margin:0;color:var(--muted);font-size:14px;line-height:1.85;max-width:520px;}
+    @media (max-width:700px){
+      .page-shell{padding:18px 14px 26px;}
+      .topbar{margin-bottom:8px;}
+      .brand{font-size:10px}.brand b{font-size:13px}.mini{font-size:11px;}
+      h1{font-size:46px;}
+      .hero-sub{font-size:20px;letter-spacing:.04em;}
+      .hero-desc{font-size:14px;line-height:1.85;}
+      .hero-top-grid{grid-template-columns:1fr;}
+      .headline-box{padding:20px;}
+      .headline-box h3{font-size:30px;}
+      .focus-chips{gap:8px;}
+      .hero-visual{padding:18px;}
+      .visual-stage{min-height:210px;}
+      .visual-grid{grid-template-columns:1fr;}
+      .statement-grid{grid-template-columns:1fr;}
+      .statement-card{padding:18px;}
+      .statement-title{font-size:22px;}
+      .quote-banner{grid-template-columns:1fr;gap:10px;padding:18px;}
+      .quote-banner .quote-no{font-size:32px;}
+      .cta-panel{padding:18px;}
+      .info-grid,.city-grid,.detail-grid{grid-template-columns:1fr;}
+      .info-card{min-height:auto;}
+      .panel-head{padding:20px 18px;flex-direction:column;}
+      h2{font-size:29px;}
+      .content{padding:16px;}
+      .city-name{font-size:28px;}
+      .coach-card{grid-template-columns:1fr;}
+      .coach-badge{justify-self:start;}
+      .profile h2{font-size:36px;}
+      .contact-card{grid-template-columns:1fr;}
+      .gallery-grid{grid-template-columns:1fr;}
+      .qr{width:120px;height:120px;}
+      .btn{width:100%;}
+      .btn.secondary,.back{width:auto;}
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <div class="wrap">
+      <div class="topbar">
+        <div class="brand"><b>美慧脊柱功能训练</b>MEIHUI BODY TRAINING</div>
+      </div>
+
+      <!-- 第二级：城市索引 -->
+      <section id="cities" class="screen">
+        <div class="breadcrumbs"><a href="#home">首页</a> / <strong>城市索引</strong></div>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">LEVEL 02 · CITY INDEX</div>
+              <h2>选择你所在的城市</h2>
+              <p class="panel-desc">城市不在首页展示。点击城市后，进入该城市的教练列表页。</p>
+            </div>
+            <a class="back" href="#home">← 返回上一级</a>
+          </div>
+          <div class="content">
+            <div class="city-grid">
+              <a class="city-card" href="#city-suzhou">
+                <div class="city-name">苏州</div>
+                <div class="city-meta"><span class="pill">1 位老师</span><span class="pill">普拉提 / 瑜伽</span></div>
+                <div class="muted">苏州地区可预约的美慧学员 / 合作老师。</div>
+                <div class="arrow">→</div>
+              </a>
+              <a class="city-card" href="#city-hanzhong">
+                <div class="city-name">汉中</div>
+                <div class="city-meta"><span class="pill">1 位老师</span><span class="pill">孕产 / 体态</span></div>
+                <div class="muted">陕西省汉中市可预约的美慧学员 / 合作老师。</div>
+                <div class="arrow">→</div>
+              </a>
+              <a class="city-card empty" href="#city-langfang">
+                <div class="city-name">廊坊</div>
+                <div class="city-meta"><span class="pill">待补充</span><span class="pill">普拉提 / 瑜伽</span></div>
+                <div class="muted">廊坊地区老师资料待补充。</div>
+              </a>
+              <a class="city-card empty" href="#city-beijing">
+                <div class="city-name">北京</div>
+                <div class="city-meta"><span class="pill">待补充</span><span class="pill">普拉提 / 瑜伽</span></div>
+                <div class="muted">北京地区老师资料待补充。</div>
+              </a>
+              <a class="city-card empty" href="#city-shanghai">
+                <div class="city-name">上海</div>
+                <div class="city-meta"><span class="pill">待补充</span><span class="pill">普拉提 / 瑜伽</span></div>
+                <div class="muted">上海地区老师资料待补充。</div>
+              </a>
+              <a class="city-card empty" href="#city-chengdu">
+                <div class="city-name">成都</div>
+                <div class="city-meta"><span class="pill">待补充</span><span class="pill">普拉提 / 瑜伽</span></div>
+                <div class="muted">成都地区老师资料待补充。</div>
+              </a>
+              <a class="city-card empty" href="#city-guangzhou">
+                <div class="city-name">广州</div>
+                <div class="city-meta"><span class="pill">待补充</span><span class="pill">普拉提 / 瑜伽</span></div>
+                <div class="muted">广州地区老师资料待补充。</div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="level-nav"><a class="back-big" href="#home">← 返回上一级</a></div>
+      </section>
+
+      <!-- 第三级：苏州教练列表 -->
+      <section id="city-suzhou" class="screen">
+        <div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <strong>苏州</strong></div>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">LEVEL 03 · COACH LIST</div>
+              <h2>苏州教练</h2>
+              <p class="panel-desc">点击老师卡片，进入第 4 级老师详情页。</p>
+            </div>
+            <a class="back" href="#cities">← 返回上一级</a>
+          </div>
+          <div class="content">
+            <div class="coach-list">
+              <a class="coach-card" href="#coach-miki">
+                <div>
+                  <h3>傅蔓 MIKI</h3>
+                  <div class="muted">苏州姑苏区 · 双塔街道｜一蔓瑜伽普拉提</div>
+                  <div class="tags">
+                    <span class="tag">理疗瑜伽</span><span class="tag">体态矫正</span><span class="tag">形体雕刻</span><span class="tag">孕产课程</span><span class="tag">普拉提大器械</span>
+                  </div>
+                </div>
+                <div class="coach-badge">进入详情 →</div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="level-nav"><a class="back-big" href="#cities">← 返回上一级</a></div>
+      </section>
+
+      <!-- 第三级：汉中教练列表 -->
+      <section id="city-hanzhong" class="screen">
+        <div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <strong>汉中</strong></div>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">LEVEL 03 · COACH LIST</div>
+              <h2>汉中教练</h2>
+              <p class="panel-desc">点击老师卡片，进入第 4 级老师详情页。</p>
+            </div>
+            <a class="back" href="#cities">← 返回上一级</a>
+          </div>
+          <div class="content">
+            <div class="coach-list">
+              <a class="coach-card" href="#coach-yueqinghua">
+                <div>
+                  <h3>岳清华</h3>
+                  <div class="muted">陕西汉中 · 汉台区｜欣育孕产体态调整</div>
+                  <div class="tags">
+                    <span class="tag">产后修复</span><span class="tag">脊柱侧弯矫正</span><span class="tag">体态调整</span><span class="tag">慢痛管理</span>
+                  </div>
+                </div>
+                <div class="coach-badge">进入详情 →</div>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="level-nav"><a class="back-big" href="#cities">← 返回上一级</a></div>
+      </section>
+
+      <!-- 其他城市占位页 -->
+      <section id="city-langfang" class="screen"><div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <strong>廊坊</strong></div><div class="panel"><div class="panel-head"><div><div class="eyebrow">LEVEL 03 · COACH LIST</div><h2>廊坊教练</h2><p class="panel-desc">该城市老师资料待补充。</p></div><a class="back" href="#cities">← 返回上一级</a></div><div class="content"><div class="detail-block"><h4>资料待补充</h4><p class="muted">后续把廊坊老师资料加入这里，即可点击进入第 4 级老师详情。</p></div></div></div><div class="level-nav"><a class="back-big" href="#cities">← 返回上一级</a></div></section>
+      <section id="city-beijing" class="screen"><div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <strong>北京</strong></div><div class="panel"><div class="panel-head"><div><div class="eyebrow">LEVEL 03 · COACH LIST</div><h2>北京教练</h2><p class="panel-desc">该城市老师资料待补充。</p></div><a class="back" href="#cities">← 返回上一级</a></div><div class="content"><div class="detail-block"><h4>资料待补充</h4><p class="muted">后续把北京老师资料加入这里，即可点击进入第 4 级老师详情。</p></div></div></div><div class="level-nav"><a class="back-big" href="#cities">← 返回上一级</a></div></section>
+      <section id="city-shanghai" class="screen"><div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <strong>上海</strong></div><div class="panel"><div class="panel-head"><div><div class="eyebrow">LEVEL 03 · COACH LIST</div><h2>上海教练</h2><p class="panel-desc">该城市老师资料待补充。</p></div><a class="back" href="#cities">← 返回上一级</a></div><div class="content"><div class="detail-block"><h4>资料待补充</h4><p class="muted">后续把上海老师资料加入这里，即可点击进入第 4 级老师详情。</p></div></div></div><div class="level-nav"><a class="back-big" href="#cities">← 返回上一级</a></div></section>
+      <section id="city-chengdu" class="screen"><div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <strong>成都</strong></div><div class="panel"><div class="panel-head"><div><div class="eyebrow">LEVEL 03 · COACH LIST</div><h2>成都教练</h2><p class="panel-desc">该城市老师资料待补充。</p></div><a class="back" href="#cities">← 返回上一级</a></div><div class="content"><div class="detail-block"><h4>资料待补充</h4><p class="muted">后续把成都老师资料加入这里，即可点击进入第 4 级老师详情。</p></div></div></div><div class="level-nav"><a class="back-big" href="#cities">← 返回上一级</a></div></section>
+      <section id="city-guangzhou" class="screen"><div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <strong>广州</strong></div><div class="panel"><div class="panel-head"><div><div class="eyebrow">LEVEL 03 · COACH LIST</div><h2>广州教练</h2><p class="panel-desc">该城市老师资料待补充。</p></div><a class="back" href="#cities">← 返回上一级</a></div><div class="content"><div class="detail-block"><h4>资料待补充</h4><p class="muted">后续把广州老师资料加入这里，即可点击进入第 4 级老师详情。</p></div></div></div><div class="level-nav"><a class="back-big" href="#cities">← 返回上一级</a></div></section>
+
+      <!-- 第四级：老师详情 -->
+      <section id="coach-miki" class="screen">
+        <div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <a href="#city-suzhou">苏州</a> / <strong>傅蔓 MIKI</strong></div>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">LEVEL 04 · COACH PROFILE</div>
+              <h2>老师详情</h2>
+              <p class="panel-desc">查看专业方向、适合人群、课程特色与预约方式。</p>
+            </div>
+            <a class="back" href="#city-suzhou">← 返回上一级</a>
+          </div>
+          <div class="content">
+            <div class="profile">
+              <div class="eyebrow">苏州姑苏区 · 双塔街道</div>
+              <h2>傅蔓 MIKI</h2>
+              <p>高级导师｜一蔓瑜伽普拉提</p>
+              <p style="margin-top:14px;">在瑜伽、普拉提、理疗、孕产、解剖和脊柱训练方向持续深耕。她的课堂不只追求动作好看，更关注身体是否安全、稳定、会发力。</p>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-block"><h4>擅长方向</h4><ul><li>理疗瑜伽</li><li>体态矫正</li><li>形体雕刻</li><li>孕产课程</li><li>球瑜伽</li><li>普拉提大器械</li></ul></div>
+              <div class="detail-block"><h4>适合人群</h4><ul><li>久坐肩颈紧张的人</li><li>想改善体态和脊柱状态的人</li><li>产后想重新建立核心的人</li><li>希望安全开始普拉提 / 瑜伽练习的人</li></ul></div>
+              <div class="detail-block"><h4>教学风格</h4><ul><li>口令引导通俗易懂</li><li>手法辅助简单到位</li><li>课堂氛围积极、有感染力</li><li>专注、耐心，重视安全练习</li></ul></div>
+            </div>
+            <div class="space-gallery">
+              <h4>场馆空间</h4>
+              <div class="gallery-grid">
+                <div class="gallery-main">一蔓瑜伽普拉提<br/>场馆主视觉图待补充</div>
+                <div class="gallery-side">
+                  <div class="gallery-small">训练区图片<br/>待补充</div>
+                  <div class="gallery-small">空间细节图<br/>待补充</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-block" style="margin-top:14px;">
+              <div class="contact-card">
+                <div>
+                  <h4>预约方式</h4>
+                  <p class="muted"><b>地址：</b>苏州市姑苏区双塔街道南环东路711号安和锦智慧交通科创园217室</p>
+                  <p class="muted"><b>联系方式：</b>微信待补充</p>
+                  <div class="cta-row"><a class="btn secondary" href="#city-suzhou">查看同城老师</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="level-nav"><a class="back-big" href="#city-suzhou">← 返回上一级</a><a class="back-big light" href="#cities">返回城市索引</a></div>
+      </section>
+
+      <!-- 第四级：老师详情 · 岳清华 -->
+      <section id="coach-yueqinghua" class="screen">
+        <div class="breadcrumbs"><a href="#home">首页</a> / <a href="#cities">城市索引</a> / <a href="#city-hanzhong">汉中</a> / <strong>岳清华</strong></div>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">LEVEL 04 · COACH PROFILE</div>
+              <h2>老师详情</h2>
+              <p class="panel-desc">查看专业方向、适合人群、课程特色与联系信息。</p>
+            </div>
+            <a class="back" href="#city-hanzhong">← 返回上一级</a>
+          </div>
+          <div class="content">
+            <div class="profile">
+              <div class="eyebrow">陕西汉中 · 汉台区</div>
+              <h2>岳清华</h2>
+              <p>欣育孕产体态调整｜三甲医院退休护士</p>
+              <p style="margin-top:14px;">她拥有三甲医院护士工作背景，关注女性产后身体恢复、体态调整与慢痛管理。课程方向以安全、细致、稳定为基础，帮助学员更好地理解身体状态，建立更健康的身体使用方式。</p>
+            </div>
+            <div class="detail-grid">
+              <div class="detail-block"><h4>擅长方向</h4><ul><li>产后修复</li><li>脊柱侧弯矫正</li><li>体态调整</li><li>慢痛管理</li></ul></div>
+              <div class="detail-block"><h4>适合人群</h4><ul><li>产后想进行身体恢复的人</li><li>想改善体态和脊柱状态的人</li><li>存在慢性疼痛困扰、希望进行身体管理的人</li><li>希望在更安全、细致方式下开始训练的人</li></ul></div>
+              <div class="detail-block"><h4>教学风格</h4><ul><li>严谨</li><li>科学</li><li>重视训练安全与身体逻辑</li></ul></div>
+            </div>
+            <div class="space-gallery">
+              <h4>场馆空间</h4>
+              <div class="gallery-grid">
+                <div class="gallery-main">欣育孕产体态调整<br/>场馆主视觉图待补充</div>
+                <div class="gallery-side">
+                  <div class="gallery-small">训练区图片<br/>待补充</div>
+                  <div class="gallery-small">空间细节图<br/>待补充</div>
+                </div>
+              </div>
+            </div>
+            <div class="detail-block" style="margin-top:14px;">
+              <div class="contact-card">
+                <div>
+                  <h4>联系信息</h4>
+                  <p class="muted"><b>地址：</b>陕西省汉中市汉台区明珠北苑28号楼2单元1503室</p>
+                  <p class="muted"><b>联系方式：</b>13369250531</p>
+                  <div class="cta-row"><a class="btn secondary" href="#city-hanzhong">查看同城老师</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="level-nav"><a class="back-big" href="#city-hanzhong">← 返回上一级</a><a class="back-big light" href="#cities">返回城市索引</a></div>
+      </section>
+
+      <!-- 第一级：首页放在最后，方便纯 CSS 隐藏默认首页 -->
+      <section id="home" class="screen">
+        <div class="hero hero-rich">
+          <div class="hero-top-grid">
+            <div>
+              <h1>美慧学员<span class="dot"> · </span><br/>城市场馆推荐计划</h1>
+              <div class="hero-sub">发现本地专业普拉提 / 瑜伽空间</div>
+
+              <div class="headline-box">
+                <div class="headline-kicker">MEIHUI CITY GUIDE</div>
+                <h3>我想把这些<br/><span>真正认真教身体的老师</span><br/>介绍给你</h3>
+                <p>希望你在需要的时候，能更快找到 <strong>专业、细致、真正懂身体</strong> 的训练空间。</p>
+              </div>
+
+
+            </div>
+
+          </div>
+
+          <div class="statement-grid">
+            <article class="statement-card">
+              <div class="section-no">01</div>
+              <h3 class="statement-title">一个好的老师，不只是会带动作</h3>
+              <p>做身体训练这些年，我越来越确定一件事：一个好的老师，不只是会带动作，而是能真正 <strong>看见身体</strong>。</p>
+              <ul class="key-list">
+                <li>看见一个人的 <strong>肩颈为什么紧</strong></li>
+                <li>看见腰背不舒服背后的 <strong>代偿</strong></li>
+                <li>看见核心无力、骨盆不稳定、呼吸浅时，训练该从哪里开始</li>
+              </ul>
+            </article>
+
+            <article class="statement-card">
+              <div class="section-no">02</div>
+              <h3 class="statement-title">我会陆续介绍这些真正认真做专业的老师</h3>
+              <p>我会陆续介绍一些我亲自接触过、学习过、交流过的普拉提 / 瑜伽老师。她们也许不一定是当地最大、最会营销的场馆，但她们有一个共同点：</p>
+              <div class="mantra">
+                <span>认真学习</span>
+                <span>认真教学</span>
+                <span>认真对待每一个来到她们面前的身体</span>
+              </div>
+            </article>
+
+            <article class="statement-card">
+              <div class="section-no">03</div>
+              <span class="spotlight">FOR LOCAL USERS</span>
+              <h3 class="statement-title">帮你少走一点弯路</h3>
+              <p>如果你在她们所在的城市，刚好想找一个 <strong>更专业、更细致、更懂身体</strong> 的训练空间，希望在这里可以帮你少走一点弯路，更快找到真正适合自己的老师和场馆。</p>
+            </article>
+
+            <article class="statement-card">
+              <div class="section-no">04</div>
+              <span class="spotlight">FOR MEIHUI STUDENTS</span>
+              <h3 class="statement-title">你的专业，值得被更多人看见</h3>
+              <p>如果你是我的学员，也希望你知道：</p>
+              <ul class="key-list">
+                <li><strong>你的专业值得被看见</strong></li>
+                <li><strong>你的场馆值得被更多当地人认识</strong></li>
+                <li>你认真做的事，我愿意帮你一起推向更多人</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="quote-banner quote-banner-clean">
+            <p class="quote-main">这是一份以 <strong>信任、专业、长期价值</strong> 为核心的城市推荐计划。</p>
+            <p class="quote-sub">不是为了堆砌信息，而是为了让真正认真做身体训练的人，被更多需要他们的人看见。</p>
+          </div>
+
+          <div class="cta-panel">
+            <p>准备好后，你可以从城市开始查找。点击进入城市索引，查看不同城市的老师与场馆推荐。</p>
+            <div class="cta-row" style="margin-top:0;">
+              <a class="btn" href="#cities">进入城市索引 →</a>
+            </div>
+          </div>
+
+          <div class="bottom-line"><span>让认真做专业的老师，被更多人看见</span><span class="slashes">////////</span></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
